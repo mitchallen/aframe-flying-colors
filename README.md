@@ -1,9 +1,9 @@
-aframe-brownian-motion
+aframe-flying-colors
 ==
 
 ## Live demo
 
-* https://mitchallen.github.io/aframe-brownian-motion/ 
+* https://mitchallen.github.io/aframe-flying-colors/ 
 
 ## Usage
 
