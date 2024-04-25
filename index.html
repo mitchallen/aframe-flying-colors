@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>A-Frame Demo</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+  <a-scene>
+
+    <a-assets>
+      <a-mixin id="marker" position-to-color></a-mixin>
+      <a-mixin id="ball" geometry="primitive: sphere; radius: 0.075;"></a-mixin>
+      <a-mixin id="flyer"
+        animation="property:position; from:1 1 1; to:-1 -1 -1; dur:5000; dir:alternate; loop:true; easing:linear;"></a-mixin>
+    </a-assets>
+
+    <a-entity id="rig" position="0 1.6 3">
+      <a-entity id="camera" camera look-controls></a-entity>
+    </a-entity>
+
+    <!-- write points json in place as a string -->
+    <a-entity id="cube2" position="0 3 0"
+      animation="property:rotation; to: 0 360 0; dur:20000; loop:true; easing:linear;"
+      multi-sphere='points: [{"x": 0, "y": 0, "z": 0}, {"x": -1, "y": -1, "z": -1}, {"x": 1, "y": 1, "z": 1}]'>
+    </a-entity>
+
+     <!-- load points json from object in code (see *.js) -->
+    <a-entity id="cubeJson" position="0 0 0"
+      scale="1.0 1.0 1.0"
+      animation="property:rotation; to: 0 360 0; dur:40000; loop:true; easing:linear;">
+
+      <a-sphere position-to-color log-position id="s1" position="0 0 0" color="red" radius="0.10"></a-sphere>
+
+      <a-entity geometry="primitive: box; width: 2; height: 2; depth: 2" position="0 0 0"
+      material="color: #0000FF; opacity: 0.5; wireframe: true" rotation="0 0 0">
+
+      <a-entity mixin="marker ball flyer" animation="to:-1 -1 -1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:1 -1 -1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:-1 1 -1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:-1 -1 1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:1 1 -1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:1 -1 1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:-1 1 1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:0 -1 -1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:-1 0 -1;"></a-entity>
+      <a-entity mixin="marker ball flyer" animation="to:-1 -1 0;"></a-entity>
+
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+
+    // Get the sphere object
+    let s1 = document.getElementById('s1');
+
+    AFRAME.registerComponent('demo', {
+      /**
+       * this.el is the entity element.
+       * this.el.object3D is the three.js object of the entity.
+       * this.data is the component's property or properties.
+       */
+      update: function (oldData) {
+        this.el.object3D.visible = this.data;
+      }
+      // ...
+    });
+
+
+    function clipValue(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    // Function to update the position and color of the sphere using Brownian motion
+    function updatePositionAndColor() {
+      // Generate random offsets based on Brownian motion formula
+      let radius = 1.0 // 0.5
+      maxMove = 1.0
+      let lower = 0.0 - radius
+      let upper = radius
+
+      // distance to move in x, y, z
+      let dx = (Math.random() - 0.5) * maxMove;
+      let dy = (Math.random() - 0.5) * maxMove;
+      let dz = (Math.random() - 0.5) * maxMove;
+
+      // Update the position of the sphere
+      var currentPosition = s1.getAttribute('position');
+
+      // console.log(currentPosition);
+
+      // calculate new position
+      // clip to within range
+      let nx = clipValue(currentPosition.x + dx, lower, upper)
+      let ny = clipValue(currentPosition.y + dy, lower, upper)
+      let nz = clipValue(currentPosition.z + dz, lower, upper)
+
+      var newPosition = {
+        x: nx,
+        y: ny,
+        z: nz
+      };
+
+      // Set the new position with animation
+      s1.setAttribute('animation__position', {
+        property: 'position',
+        dur: '500',
+        easing: 'easeOutCubic',
+        to: newPosition.x + ' ' + newPosition.y + ' ' + newPosition.z
+      });
+    }
+
+    // Update the position and color every 1000 milliseconds
+    setInterval(updatePositionAndColor, 500);
+  </script>
+  <script type="module" src="./src/app.js"></script>
+</body>
+
+</html>
